@@ -5,7 +5,7 @@ let player = letterX
 let playerTurn = document.getElementById('turn');
 let playerXMoves = [];
 let playerOMoves = [];
-//let winningCombos = [['cell-0', 'cell-1', 'cell-2'], ['cell-3', 'cell-4', 'cell-5'], ['cell-6', 'cell-7', 'cell-8'], ['cell-0', 'cell-3', 'cell-6'], ['cell-1', 'cell-4', 'cell-7'], ['cell-2', 'cell-5', 'cell-8'], ['cell-0', 'cell-4', 'cell-8'], ['cell-2', 'cell-4', 'cell-6']];
+let winningCombos = [['cell-0', 'cell-1', 'cell-2'], ['cell-3', 'cell-4', 'cell-5'], ['cell-6', 'cell-7', 'cell-8'], ['cell-0', 'cell-3', 'cell-6'], ['cell-1', 'cell-4', 'cell-7'], ['cell-2', 'cell-5', 'cell-8'], ['cell-0', 'cell-4', 'cell-8'], ['cell-2', 'cell-4', 'cell-6']];
 let currentArray = playerXMoves;
 let turnCount = 0;
 //let activeCell = document.querySelectorAll('squares');
@@ -37,17 +37,21 @@ function stop() {
 }
 
 function winCheck() {
-  if (currentArray.includes('cell-0') && currentArray.includes('cell-1') && currentArray.includes('cell-2') || currentArray.includes('cell-3') && currentArray.includes('cell-4') && currentArray.includes('cell-5') || currentArray.includes('cell-6') && currentArray.includes('cell-7') && currentArray.includes('cell-8') || currentArray.includes('cell-0') && currentArray.includes('cell-3') && currentArray.includes('cell-6') || currentArray.includes('cell-1') && currentArray.includes('cell-4') && currentArray.includes('cell-7') || currentArray.includes('cell-2') && currentArray.includes('cell-5') && currentArray.includes('cell-8') || currentArray.includes('cell-0') && currentArray.includes('cell-4') && currentArray.includes('cell-8') || currentArray.includes('cell-2') && currentArray.includes('cell-4') && currentArray.includes('cell-6')) {
-    if (player === letterX) {
-      playerTurn.innerHTML = 'Congratulations!  Player X Wins!!!';
-      stop();
-    } else if (player === letterO) {
-      playerTurn.innerHTML = 'Congratulations!  Player O Wins!!!';
-      stop();
+  console.log(currentArray)
+  for (combo of winningCombos) {
+    console.log(combo);
+    if (currentArray.includes(combo)) {
+      if (player === letterX) {
+        playerTurn.innerHTML = 'Congratulations!  Player X Wins!!!';
+        stop();
+      } else if (player === letterO) {
+        playerTurn.innerHTML = 'Congratulations!  Player O Wins!!!';
+        stop();
+      }
     }
-  } 
-  else {
-    toggle();
+    else {
+
+    }
   }
 };
 
@@ -57,6 +61,7 @@ function play(e) {
     currentArray.push(e.currentTarget.id);
     turnCount++;
     winCheck();
+    toggle();
   }
 }
 
