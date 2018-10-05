@@ -38,19 +38,24 @@ function stop() {
 
 function winCheck() {
   console.log(currentArray)
-  for (combo of winningCombos) {
+  for (let combo of winningCombos) {
     console.log(combo);
-    if (currentArray.includes(combo)) {
-      if (player === letterX) {
-        playerTurn.innerHTML = 'Congratulations!  Player X Wins!!!';
-        stop();
-      } else if (player === letterO) {
-        playerTurn.innerHTML = 'Congratulations!  Player O Wins!!!';
-        stop();
+    let moves = combo.values();
+    console.log(moves)
+    for (let mof of moves) {
+      console.log (mof)
+      if (currentArray.includes(moves)) {
+        if (player === letterX) {
+          playerTurn.innerHTML = 'Congratulations!  Player X Wins!!!';
+          stop();
+        } else if (player === letterO) {
+          playerTurn.innerHTML = 'Congratulations!  Player O Wins!!!';
+          stop();
+        }
       }
-    }
-    else {
+      else {
 
+      }
     }
   }
 };
