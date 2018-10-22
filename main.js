@@ -7,9 +7,21 @@ let playerTurn = document.getElementById('turn');
 let playerXMoves = [];
 let playerOMoves = [];
 let currentArray = playerXMoves;
+let opponentArray = playerOMoves;
 let turnCount = 0;
 let lineDiv = document.getElementById('line0');
 let winner = null;
+
+let winConditions = [
+  [0, 1, 2, 'top-row'],
+  [3, 4, 5, 'middle-row'],
+  [6, 7, 8, 'bottom-row'],
+  [0, 3, 6, 'left-col'],
+  [1, 4, 7, 'middle-col'],
+  [2, 5, 8, 'right-col'],
+  [0, 4, 8, 'left-diag'],
+  [2, 4, 6, 'right-diag']
+];
 
 function clearBoard() {
   winner = null;
@@ -60,6 +72,7 @@ function stop() {
     let stopSquare = document.getElementById(`cell-${i}`);
     stopSquare.removeEventListener('click', play);
   }
+  buttonStart();
 }
 
 function xOrOWins() {
@@ -73,111 +86,125 @@ function xOrOWins() {
   stop();
 }
 
+function winTriplet(a, b, c) {
+  if (currentArray.includes(`cell-${a}`) && currentArray.includes(`cell-${b}`) && currentArray.includes(`cell-${c}`)) {
+    return true;
+  }
+};
+
+function canIWin(a, b, c) {
+  if (currentArray.includes(`cell-${a}`) && currentArray.includes(`cell-${b}`) && document.getElementById(`cell-${c}`).innerHTML === '') {
+    return `cell-${c}`;
+  } else if (currentArray.includes(`cell-${b}`) && currentArray.includes(`cell-${c}`) && document.getElementById(`cell-${a}`).innerHTML === '') {
+    return `cell-${a}`;
+  } else if (currentArray.includes(`cell-${a}`) && currentArray.includes(`cell-${c}`) && document.getElementById(`cell-${b}`).innerHTML === '') {
+    return `cell-${b}`;
+  }
+}
+
+function iCanWin() {
+  for (let win of winConditions) {
+    if (canIWin(win[0], win[1], win[2])) {
+      let winCell = canIWin(win[0], win[1], win[2]);
+      console.log("win = " + winCell);
+      return winCell;
+    }
+  }
+}
+
+function winBlock(a, b, c) {
+  if (opponentArray.includes(`cell-${a}`) && opponentArray.includes(`cell-${b}`) && document.getElementById(`cell-${c}`).innerHTML === '') {
+    return `cell-${c}`;
+  } else if (opponentArray.includes(`cell-${b}`) && opponentArray.includes(`cell-${c}`) && document.getElementById(`cell-${a}`).innerHTML === '') {
+    return `cell-${a}`;
+  } else if (opponentArray.includes(`cell-${a}`) && opponentArray.includes(`cell-${c}`) && document.getElementById(`cell-${b}`).innerHTML === '') {
+    return `cell-${b}`;
+  }
+}
+
+function iCanBlock() {
+  for (let win of winConditions) {
+    if (winBlock(win[0], win[1], win[2])) {
+      let blockedCell = winBlock(win[0], win[1], win[2]);
+      console.log("block = " + blockedCell);
+      return blockedCell;
+    }
+  }
+}
+
+function showWinner(line) {
+  lineDiv.innerHTML = `<div id="${line}"></div>`;
+  xOrOWins();
+}
+
 function winCheck() {
-  if (currentArray.includes('cell-0') && currentArray.includes('cell-1') && currentArray.includes('cell-2')) {
-    lineDiv.innerHTML = '<div id="top-row"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-3') && currentArray.includes('cell-4') && currentArray.includes('cell-5')) {
-    lineDiv.innerHTML = '<div id="middle-row"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-6') && currentArray.includes('cell-7') && currentArray.includes('cell-8')) {
-    lineDiv.innerHTML = '<div id="bottom-row"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-0') && currentArray.includes('cell-3') && currentArray.includes('cell-6')) {
-    lineDiv.innerHTML = '<div id="left-col"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-1') && currentArray.includes('cell-4') && currentArray.includes('cell-7')) {
-    lineDiv.innerHTML = '<div id="middle-col"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-2') && currentArray.includes('cell-5') && currentArray.includes('cell-8')) {
-    lineDiv.innerHTML = '<div id="right-col"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-0') && currentArray.includes('cell-4') && currentArray.includes('cell-8')) {
-    lineDiv.innerHTML = '<div id="left-diag"></div>';
-    xOrOWins();
-  } else if (currentArray.includes('cell-2') && currentArray.includes('cell-4') && currentArray.includes('cell-6')) {
-    lineDiv.innerHTML = '<div id="right-diag"></div>';
-    xOrOWins();
-  } else if (turnCount === 9) {
+  for (let win of winConditions) {
+    if (winTriplet(win[0], win[1], win[2])) {
+      showWinner(win[3]);
+      return true;
+    }
+  } if (turnCount === 9) {
     playerTurn.innerHTML = "It's a DRAW.........";
-    stop();
   } else {
     toggle();
   }
 }
 
-function findEmptySquare() {
-  if (document.getElementById("cell-4").innerHTML === '') {
-    return "cell-4";
-  } else if (turnCount === 1) {
-    let cornerArray = [0, 2, 6, 8];
-    return "cell-" + cornerArray[(Math.floor(Math.random() * 4))];
-  } else {
-    let emptyArray = [];
-    for (let i = 0; i < 9; i++) {
-      if (document.getElementById("cell-" + i).innerHTML === '') {
-        emptyArray.push("cell-" + i);
-      }
-    }
-    console.log("emptyArray = " + emptyArray);
-    let currentSpace = +currentArray[currentArray.length - 1].slice(5);
-    console.log("currentSpace = " + currentSpace);
-    if (emptyArray.includes("cell-" + (currentSpace + 2))) {
-      console.log("+2");
-      return "cell-" + (currentSpace + 2);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 2))) {
-      console.log("-2");
-      return "cell-" + (currentSpace - 2);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 4))) {
-      console.log("+4");
-      return "cell-" + (currentSpace + 4);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 4))) {
-      console.log("-4");
-      return "cell-" + (currentSpace - 4);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 6))) {
-      console.log("+6");
-      return "cell-" + (currentSpace + 6);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 6))) {
-      console.log("-6");
-      return "cell-" + (currentSpace - 6);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 3))) {
-      console.log("+3");
-      return "cell-" + (currentSpace + 3);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 3))) {
-      console.log("-3");
-      return "cell-" + (currentSpace - 3);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 5))) {
-      console.log("+5");
-      return "cell-" + (currentSpace + 5);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 5))) {
-      console.log("-5");
-      return "cell-" + (currentSpace - 5);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 1))) {
-      console.log("+5");
-      return "cell-" + (currentSpace + 1);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 1))) {
-      console.log("-5");
-      return "cell-" + (currentSpace - 1);
-    } else if (emptyArray.includes("cell-" + (currentSpace + 7))) {
-      console.log("+5");
-      return "cell-" + (currentSpace + 7);
-    } else if (emptyArray.includes("cell-" + (currentSpace - 7))) {
-      console.log("-5");
-      return "cell-" + (currentSpace - 7);
-    } else {
-      console.log("random");
+function firstCorner() {
+  let cornerArray = [0, 2, 6, 8];
+  return "cell-" + cornerArray[(Math.floor(Math.random() * 4))];
+}
+
+function secondCorner() {
+  if (document.getElementById("cell-0").innerHTML !== '' && document.getElementById("cell-2").innerHTML === '') {
+    return "cell-2";
+  } else if (document.getElementById("cell-2").innerHTML !== '' && document.getElementById("cell-8").innerHTML === '') {
+    return "cell-8";
+  } else if (document.getElementById("cell-8").innerHTML !== '' && document.getElementById("cell-6").innerHTML === '') {
+    return "cell-6";
+  } else if (document.getElementById("cell-6").innerHTML !== '' && document.getElementById("cell-0").innerHTML === '') {
+    return "cell-0";
+  }
+}
+
+function randomSquare() {
+  console.log("random");
+  let emptyArray = [];
+  for (let i = 0; i < 9; i++) {
+    if (document.getElementById("cell-" + i).innerHTML === '') {
+      emptyArray.push("cell-" + i);
       return emptyArray[(Math.floor(Math.random() * emptyArray.length))];
     }
   }
 }
 
+function computerAI() {
+  if (document.getElementById("cell-4").innerHTML === '') {
+    return "cell-4";
+  } else if (turnCount === 1) {
+    return (firstCorner());
+  } else if (turnCount === 2) {
+    return (secondCorner());
+  } else if (iCanWin()) {
+    return (iCanWin());
+  } else if (iCanBlock()) {
+    return (iCanBlock());
+  } else if (turnCount === 9) {
+    playerTurn.innerHTML = "It's a DRAW.........";
+    return true;
+  } else {
+    return (randomSquare());
+  }
+}
+
+
 function computerPlayer() {
   if (winner === null) {
-    let emptySquare = findEmptySquare();
+    let mySquare = computerAI();
+    console.log("mySquare = " + mySquare);
     console.log("Player 1");
-    document.getElementById(emptySquare).innerHTML = player;
-    console.log("emptySquare = " + emptySquare);
-    currentArray.push(emptySquare);
+    document.getElementById(mySquare).innerHTML = player;
+    currentArray.push(mySquare);
     turnCount++;
     winCheck();
     if (numPlayers === 0) {
@@ -188,11 +215,11 @@ function computerPlayer() {
 
 function computerPlayer2() {
   if (winner === null) {
-    let emptySquare = findEmptySquare();
+    let mySquare = computerAI();
     console.log("Player 2");
-    document.getElementById(emptySquare).innerHTML = player;
-    console.log("emptySquare = " + emptySquare);
-    currentArray.push(emptySquare);
+    document.getElementById(mySquare).innerHTML = player;
+    console.log("mySquare = " + mySquare);
+    currentArray.push(mySquare);
     turnCount++;
     winCheck();
     setTimeout(computerPlayer, 500);
@@ -206,7 +233,7 @@ function play(e) {
     turnCount++;
     winCheck();
     if (numPlayers === 1) {
-      setTimeout(computerPlayer);
+      computerPlayer();
     }
   } else {
     playerTurn.innerHTML = "Impossible! That cell is already full.";
@@ -217,11 +244,13 @@ function toggle() {
   if (player === letterX) {
     player = letterO;
     currentArray = playerOMoves;
+    opponentArray = playerXMoves;
     playerTurn.innerHTML = "It is player O's turn";
   }
   else {
     player = letterX;
     currentArray = playerXMoves;
+    opponentArray = playerOMoves;
     playerTurn.innerHTML = "It is player X's turn";
   };
 };
