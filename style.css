@@ -77,8 +77,8 @@ button {
   height: 40px;
   border: solid red;
   border-radius: 8px;
-  margin-top: 28px;
-  margin-bottom: 25px;
+  margin: 28px 0 25px 0;
+  line-height: 0;
 }
 
 #turn {

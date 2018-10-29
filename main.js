@@ -1,6 +1,5 @@
 let letterX = '<img src="x.png" height="120" width="120" id="x">';
 let letterO = '<img src="o.png" height="120" width="120" id="o">';
-let squares = document.getElementsByClassName('squares');
 let player = letterX
 let numPlayers = 1;
 let playerTurn = document.getElementById('turn');
@@ -12,7 +11,16 @@ let turnCount = 0;
 let lineDiv = document.getElementById('line0');
 let winner = null;
 
-let winConditions = [
+const corners = [0, 2, 6, 8];
+
+const adjacentCorners = [
+  [0, 2, 6],
+  [2, 8, 0],
+  [8, 6, 2],
+  [6, 0, 8]
+];
+
+const winConditions = [
   [0, 1, 2, 'top-row'],
   [3, 4, 5, 'middle-row'],
   [6, 7, 8, 'bottom-row'],
@@ -24,6 +32,8 @@ let winConditions = [
 ];
 
 function clearBoard() {
+  console.log('');
+  console.log('----- New Game -----');
   winner = null;
   lineDiv.innerHTML = '';
   player = letterX
@@ -106,7 +116,6 @@ function iCanWin() {
   for (let win of winConditions) {
     if (canIWin(win[0], win[1], win[2])) {
       let winCell = canIWin(win[0], win[1], win[2]);
-      console.log("win = " + winCell);
       return winCell;
     }
   }
@@ -126,7 +135,6 @@ function iCanBlock() {
   for (let win of winConditions) {
     if (winBlock(win[0], win[1], win[2])) {
       let blockedCell = winBlock(win[0], win[1], win[2]);
-      console.log("block = " + blockedCell);
       return blockedCell;
     }
   }
@@ -150,30 +158,24 @@ function winCheck() {
   }
 }
 
-function firstCorner() {
-  let cornerArray = [0, 2, 6, 8];
-  return "cell-" + cornerArray[(Math.floor(Math.random() * 4))];
+function randomArray(array) {
+  return array[(Math.floor(Math.random() * array.length))];
 }
 
 function secondCorner() {
-  if (document.getElementById("cell-0").innerHTML !== '' && document.getElementById("cell-2").innerHTML === '') {
-    return "cell-2";
-  } else if (document.getElementById("cell-2").innerHTML !== '' && document.getElementById("cell-8").innerHTML === '') {
-    return "cell-8";
-  } else if (document.getElementById("cell-8").innerHTML !== '' && document.getElementById("cell-6").innerHTML === '') {
-    return "cell-6";
-  } else if (document.getElementById("cell-6").innerHTML !== '' && document.getElementById("cell-0").innerHTML === '') {
-    return "cell-0";
+  for (array of adjacentCorners) {
+    if (opponentArray[0] == `cell-${array[0]}`) {
+      return array[randomArray([1, 2])];
+    }
   }
 }
 
 function randomSquare() {
-  console.log("random");
   let emptyArray = [];
   for (let i = 0; i < 9; i++) {
     if (document.getElementById("cell-" + i).innerHTML === '') {
       emptyArray.push("cell-" + i);
-      return emptyArray[(Math.floor(Math.random() * emptyArray.length))];
+      return randomArray(emptyArray);
     }
   }
 }
@@ -182,27 +184,29 @@ function computerAI() {
   if (document.getElementById("cell-4").innerHTML === '') {
     return "cell-4";
   } else if (turnCount === 1) {
-    return (firstCorner());
+    return `cell-${randomArray(corners)}`;
   } else if (turnCount === 2) {
-    return (secondCorner());
+    return `cell-${secondCorner()}`;
   } else if (iCanWin()) {
+    console.log("win");
     return (iCanWin());
   } else if (iCanBlock()) {
+    console.log("block");
     return (iCanBlock());
   } else if (turnCount === 9) {
     playerTurn.innerHTML = "It's a DRAW.........";
     return true;
   } else {
+    console.log("random");
     return (randomSquare());
   }
 }
 
 
 function computerPlayer() {
-  if (winner === null) {
+  if (winner === null && turnCount < 9) {
     let mySquare = computerAI();
-    console.log("mySquare = " + mySquare);
-    console.log("Player 1");
+    console.log("Player O = " + mySquare);
     document.getElementById(mySquare).innerHTML = player;
     currentArray.push(mySquare);
     turnCount++;
@@ -216,9 +220,8 @@ function computerPlayer() {
 function computerPlayer2() {
   if (winner === null) {
     let mySquare = computerAI();
-    console.log("Player 2");
+    console.log("Player X = " + mySquare);
     document.getElementById(mySquare).innerHTML = player;
-    console.log("mySquare = " + mySquare);
     currentArray.push(mySquare);
     turnCount++;
     winCheck();
